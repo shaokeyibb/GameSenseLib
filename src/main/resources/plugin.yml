@@ -1,0 +1,6 @@
+name: GameSenseLib
+version: '${version}'
+main: io.hikarilan.gamesenselib.GameSenseLib
+api-version: 1.13
+authors: [ HikariLan ]
+description: GameSenseLib helps you to create an amazing minigame in a simple way
