@@ -6,6 +6,7 @@ import io.hikarilan.gamesenselib.artifacts.IReusable;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.var;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -112,6 +113,7 @@ public class FlowManager implements IReusable {
     public void destroy() {
     }
 
+    @NotNull
     public static PhaseManagerBuilder builder() {
         return new PhaseManagerBuilder();
     }
@@ -129,7 +131,8 @@ public class FlowManager implements IReusable {
          * @param supplier phase function
          * @return this builder
          */
-        public PhaseManagerBuilder addPhase(int priority, Supplier<Phase> supplier) {
+        @NotNull
+        public PhaseManagerBuilder addPhase(int priority, @NotNull Supplier<@NotNull Phase> supplier) {
             flows.putIfAbsent(priority, Lists.newArrayList());
             flows.get(priority).add(supplier.get());
             return this;
@@ -144,12 +147,14 @@ public class FlowManager implements IReusable {
          * @param supplier phases function
          * @return this builder
          */
-        public PhaseManagerBuilder addAllPhase(int priority, Supplier<Collection<Phase>> supplier) {
+        @NotNull
+        public PhaseManagerBuilder addAllPhase(int priority, @NotNull Supplier<@NotNull Collection<@NotNull Phase>> supplier) {
             flows.putIfAbsent(priority, Lists.newArrayList());
             flows.get(priority).addAll(supplier.get());
             return this;
         }
 
+        @NotNull
         public FlowManager build() {
             return new FlowManager(flows);
         }

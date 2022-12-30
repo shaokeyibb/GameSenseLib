@@ -3,6 +3,7 @@ package io.hikarilan.gamesenselib.flows;
 import io.hikarilan.gamesenselib.artifacts.IReusable;
 import lombok.Builder;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
@@ -85,7 +86,8 @@ public class Phase implements IReusable {
      * @param duration delay duration
      * @return onTick function
      */
-    public static Supplier<Boolean> delay(Duration duration) {
+    @NotNull
+    public static Supplier<Boolean> delay(@NotNull Duration duration) {
         val remain = new AtomicReference<>(duration);
         return () -> isZeroOrNegative(remain.updateAndGet(it -> it.minus(ofTick(1))));
     }
