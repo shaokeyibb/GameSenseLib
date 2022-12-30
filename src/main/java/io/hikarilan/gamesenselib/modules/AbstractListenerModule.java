@@ -2,6 +2,7 @@ package io.hikarilan.gamesenselib.modules;
 
 import io.hikarilan.gamesenselib.events.IGameListener;
 import io.hikarilan.gamesenselib.games.AbstractGame;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public abstract class AbstractListenerModule implements IModule, IGameListener {
 
+    @Getter
     private final AbstractGame game;
 
     @Override

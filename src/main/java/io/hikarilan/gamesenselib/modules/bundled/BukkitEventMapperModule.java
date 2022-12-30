@@ -1,5 +1,6 @@
 package io.hikarilan.gamesenselib.modules.bundled;
 
+import io.hikarilan.gamesenselib.events.game.PlayerQuitGameEvent;
 import io.hikarilan.gamesenselib.games.AbstractGame;
 import io.hikarilan.gamesenselib.modules.IModule;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +9,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * <b>已捆绑模块（会在游戏实例创建时自动加载）。</b>
@@ -24,7 +27,9 @@ import org.bukkit.plugin.Plugin;
 @RequiredArgsConstructor
 public class BukkitEventMapperModule implements IModule, Listener {
 
+    @NotNull
     private final Plugin plugin;
+    @NotNull
     private final AbstractGame game;
 
     @Override
@@ -49,5 +54,14 @@ public class BukkitEventMapperModule implements IModule, Listener {
         // Update cache when player join server
         player.updateCache();
         player.consumeAllQueue(e.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e) {
+        // Find the player in the game.
+        val player = game.findPlayer(e.getPlayer());
+        if (player == null) return;
+        // Call event
+        game.postEvent(new PlayerQuitGameEvent(game, player));
     }
 }

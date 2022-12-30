@@ -3,6 +3,7 @@ package io.hikarilan.gamesenselib.modules.bundled;
 import io.hikarilan.gamesenselib.games.AbstractGame;
 import io.hikarilan.gamesenselib.modules.IModule;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * <b>已捆绑模块（会在游戏实例创建时自动加载）。</b>
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public class FlowTickModule implements IModule {
+    @NotNull
     private final AbstractGame game;
 
     @Override

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * <b>已捆绑模块（会在游戏实例创建时自动加载）。</b>
@@ -19,8 +20,11 @@ import org.bukkit.scheduler.BukkitTask;
 @RequiredArgsConstructor
 public class ModuleTickModule implements IModule {
 
+    @NotNull
     private final Plugin plugin;
+    @NotNull
     private final AbstractGame game;
+
     private BukkitTask ticker;
 
     @Override

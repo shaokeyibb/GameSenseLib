@@ -60,11 +60,13 @@ public abstract class AbstractGame implements IReusable, IModuleHolder, IGameEve
     private final EventBus eventBus = new EventBus();
 
     @Getter
-    private final Map<Class<? extends IModule>, IModule> moduleMap = Maps.newHashMap();
+    private final Map<Class<? extends IModule>, IModule> installedModules = Maps.newHashMap();
 
     public AbstractGame(Plugin plugin, FlowManager.FlowManagerBuilder flowManagerBuilder) {
         this.plugin = plugin;
         this.flowManager = flowManagerBuilder.$game(this).build();
+
+        init();
     }
 
     /**
@@ -191,8 +193,12 @@ public abstract class AbstractGame implements IReusable, IModuleHolder, IGameEve
 
     /**
      * 将指定玩家实例添加到当前游戏实例中。
+     * <br/>
+     * 请注意，这可能并不意味着玩家加入了游戏。
      * <p>
      * Add the specified player instance to the current game instance.
+     * <br/>
+     * Please note that this does not necessarily mean that the player has joined the game.
      *
      * @param player the player to add
      */
@@ -204,8 +210,12 @@ public abstract class AbstractGame implements IReusable, IModuleHolder, IGameEve
 
     /**
      * 将指定玩家实例从当前游戏实例中移除。
+     * <br/>
+     * 请注意，这可能并不意味着玩家退出了游戏。
      * <p>
      * Remove the specified player instance from the current game instance.
+     * <br/>
+     * Please note that this does not necessarily mean that the player has left the game.
      *
      * @param player the player to remove
      */

@@ -40,7 +40,7 @@ public interface IGameEventBus {
      * @param event the event
      * @return the event after the call
      */
-    default AbstractGameEvent postEvent(AbstractGameEvent event) {
+    default <T extends AbstractGameEvent> T postEvent(T event) {
         getEventBus().post(event);
         return event;
     }

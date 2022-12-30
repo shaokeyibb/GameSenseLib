@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.val;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -177,6 +178,18 @@ public abstract class AbstractPlayer implements IConsumerQueueHolder<Player> {
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
         runWhenOnline(player -> player.setDisplayName(displayName));
+    }
+
+    /**
+     * 将玩家传送到指定位置。
+     * <p>
+     * Teleport the player to the specified location.
+     *
+     * @param location the location to teleport.
+     */
+    @OfflineQueued
+    public void teleport(Location location) {
+        runWhenOnline(player -> player.teleport(location));
     }
 
     /**
