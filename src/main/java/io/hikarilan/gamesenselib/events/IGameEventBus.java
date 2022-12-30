@@ -1,10 +1,8 @@
 package io.hikarilan.gamesenselib.events;
 
-import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * 代表一个游戏事件总线。
@@ -25,14 +23,14 @@ public interface IGameEventBus {
      * <p>
      * The list of all event listeners managed by this event bus.
      */
-    Set<IGameListener> handlerList = Sets.newHashSet();
+    Set<IGameListener> getHandlerList();
 
     /**
      * Guava 事件总线实例。
      * <p>
      * Guava event bus instance.
      */
-    EventBus eventBus = new EventBus("Game" + UUID.randomUUID());
+    EventBus getEventBus();
 
     /**
      * 发布一个事件
@@ -43,7 +41,7 @@ public interface IGameEventBus {
      * @return the event after the call
      */
     default AbstractGameEvent postEvent(AbstractGameEvent event) {
-        eventBus.post(event);
+        getEventBus().post(event);
         return event;
     }
 
@@ -55,8 +53,8 @@ public interface IGameEventBus {
      * @param listener the listener
      */
     default void registerListener(IGameListener listener) {
-        handlerList.add(listener);
-        eventBus.register(listener);
+        getHandlerList().add(listener);
+        getEventBus().register(listener);
     }
 
     /**
@@ -67,8 +65,8 @@ public interface IGameEventBus {
      * @param listener the listener
      */
     default void unregisterListener(IGameListener listener) {
-        handlerList.remove(listener);
-        eventBus.unregister(listener);
+        getHandlerList().remove(listener);
+        getEventBus().unregister(listener);
     }
 
     /**
@@ -77,8 +75,8 @@ public interface IGameEventBus {
      * Unregisters all event listeners managed by this EventBus
      */
     default void unregisterAllListeners() {
-        handlerList.forEach(eventBus::unregister);
-        handlerList.clear();
+        getHandlerList().forEach(getEventBus()::unregister);
+        getHandlerList().clear();
     }
 
 }

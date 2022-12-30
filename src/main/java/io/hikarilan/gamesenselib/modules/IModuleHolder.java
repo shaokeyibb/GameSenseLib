@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -23,7 +22,7 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public interface IModuleHolder extends IReusable {
 
-    Map<Class<? extends IModule>, IModule> installedModules = new HashMap<>();
+    Map<Class<? extends IModule>, IModule> getInstalledModules();
 
     /**
      * 安装一个模块。
@@ -42,7 +41,7 @@ public interface IModuleHolder extends IReusable {
         if (hasModule(module))
             throw new IllegalStateException("The module " + module.getClass() + " already installed.");
         module.onInstall();
-        installedModules.put(module.getClass(), module);
+        getInstalledModules().put(module.getClass(), module);
     }
 
     /**
@@ -61,7 +60,7 @@ public interface IModuleHolder extends IReusable {
     default void uninstallModule(@NotNull Class<? extends IModule> module) {
         if (!hasModule(module))
             throw new IllegalStateException("The module " + module + " not installed yet.");
-        val uninstalled = installedModules.remove(module);
+        val uninstalled = getInstalledModules().remove(module);
         if (uninstalled != null) uninstalled.onUninstall();
     }
 
@@ -92,7 +91,7 @@ public interface IModuleHolder extends IReusable {
      * The {@link IModule#onUninstall()} method will be called by order.
      */
     default void uninstallAllModule() {
-        val iter = installedModules.values().iterator();
+        val iter = getInstalledModules().values().iterator();
         while (iter.hasNext()) {
             iter.next().onUninstall();
             iter.remove();
@@ -108,7 +107,7 @@ public interface IModuleHolder extends IReusable {
      * @return if the module exists.
      */
     default boolean hasModule(@NotNull Class<? extends IModule> module) {
-        return installedModules.containsKey(module);
+        return getInstalledModules().containsKey(module);
     }
 
     /**
@@ -120,7 +119,7 @@ public interface IModuleHolder extends IReusable {
      * @return if the module exists.
      */
     default boolean hasModule(@NotNull IModule module) {
-        return installedModules.containsKey(module.getClass());
+        return getInstalledModules().containsKey(module.getClass());
     }
 
     /**
@@ -134,7 +133,7 @@ public interface IModuleHolder extends IReusable {
     @Nullable
     @SuppressWarnings("unchecked")
     default <T extends IModule> T getModule(@NotNull Class<T> module) {
-        return (T) installedModules.get(module);
+        return (T) getInstalledModules().get(module);
     }
 
     /**
@@ -145,7 +144,7 @@ public interface IModuleHolder extends IReusable {
      * the list of installed modules will be copied to avoid some conflicts.
      */
     default void tick() {
-        new ArrayList<>(installedModules.values()).forEach(IModule::onTick);
+        new ArrayList<>(getInstalledModules().values()).forEach(IModule::onTick);
     }
 
     @Override

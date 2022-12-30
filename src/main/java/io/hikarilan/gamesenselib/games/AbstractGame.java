@@ -1,14 +1,20 @@
 package io.hikarilan.gamesenselib.games;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.eventbus.EventBus;
 import io.hikarilan.gamesenselib.artifacts.IReusable;
 import io.hikarilan.gamesenselib.events.IGameEventBus;
+import io.hikarilan.gamesenselib.events.IGameListener;
 import io.hikarilan.gamesenselib.flows.FlowManager;
+import io.hikarilan.gamesenselib.modules.IModule;
 import io.hikarilan.gamesenselib.modules.IModuleHolder;
 import io.hikarilan.gamesenselib.modules.bundled.ModuleTickModule;
 import io.hikarilan.gamesenselib.players.AbstractPlayer;
+import lombok.Getter;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -33,6 +39,16 @@ public abstract class AbstractGame implements IReusable, IModuleHolder, IGameEve
      * The player list of this game instance.
      */
     private final Set<AbstractPlayer> players = Sets.newHashSet();
+
+    @Getter
+    private final Set<IGameListener> handlerList = Sets.newHashSet();
+
+    @SuppressWarnings("UnstableApiUsage")
+    @Getter
+    private final EventBus eventBus = new EventBus();
+
+    @Getter
+    private final Map<Class<? extends IModule>, IModule> moduleMap = Maps.newHashMap();
 
     public AbstractGame(Plugin plugin, FlowManager.FlowManagerBuilder flowManagerBuilder) {
         this.plugin = plugin;
