@@ -2,6 +2,7 @@ package io.hikarilan.gamesenselib.games;
 
 import com.google.common.collect.Sets;
 import io.hikarilan.gamesenselib.artifacts.IReusable;
+import io.hikarilan.gamesenselib.events.IGameEventBus;
 import io.hikarilan.gamesenselib.flows.FlowManager;
 import io.hikarilan.gamesenselib.modules.IModuleHolder;
 import io.hikarilan.gamesenselib.modules.bundled.ModuleTickModule;
@@ -15,7 +16,7 @@ import java.util.Set;
  * <p>
  * Represent a game instance base class.
  */
-public abstract class AbstractGame implements IReusable, IModuleHolder {
+public abstract class AbstractGame implements IReusable, IModuleHolder, IGameEventBus {
 
     private final Plugin plugin;
 
@@ -74,6 +75,7 @@ public abstract class AbstractGame implements IReusable, IModuleHolder {
         flowManager.destroy();
         IModuleHolder.super.destroy();
 
+        unregisterAllListeners();
         removeAllPlayers();
     }
 }
