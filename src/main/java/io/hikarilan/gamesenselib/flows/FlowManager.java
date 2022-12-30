@@ -109,11 +109,13 @@ public class FlowManager implements IReusable {
 
     @Override
     public void init() {
+        flows.values().stream().flatMap(List::stream).forEach(Phase::init);
         pointer = 0;
     }
 
     @Override
     public void destroy() {
+        flows.values().stream().flatMap(List::stream).forEach(Phase::destroy);
     }
 
     @NotNull

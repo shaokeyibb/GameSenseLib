@@ -47,7 +47,6 @@ import static io.hikarilan.gamesenselib.utils.Durations.ofTick;
  * @see FlowManager
  */
 @SuppressWarnings("unused")
-@Builder
 public class Phase implements IReusable {
 
     /**
@@ -73,6 +72,13 @@ public class Phase implements IReusable {
     @Builder.Default
     Consumer<AbstractGame> onEnd = (_ignored) -> {
     };
+
+    @Builder
+    public Phase(Consumer<AbstractGame> onStart, Function<AbstractGame, Boolean> onTick, Consumer<AbstractGame> onEnd) {
+        this.onStart = onStart;
+        this.onTick = onTick;
+        this.onEnd = onEnd;
+    }
 
     /**
      * 在游戏的一个阶段中延迟指定时间
@@ -100,6 +106,7 @@ public class Phase implements IReusable {
      * <p>
      * Is {@link #onStart} invoked.
      */
+
     private boolean isStartFinish;
     /**
      * onTick 是否返回 true。
