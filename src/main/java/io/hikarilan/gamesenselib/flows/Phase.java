@@ -1,12 +1,15 @@
 package io.hikarilan.gamesenselib.flows;
 
 import io.hikarilan.gamesenselib.artifacts.IReusable;
+import io.hikarilan.gamesenselib.games.AbstractGame;
 import lombok.Builder;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static io.hikarilan.gamesenselib.utils.Durations.isZeroOrNegative;
@@ -53,7 +56,7 @@ public class Phase implements IReusable {
      * Invoked when phase first run.
      */
     @Builder.Default
-    Runnable onStart = () -> {
+    Consumer<AbstractGame> onStart = (_ignored) -> {
     };
     /**
      * 当阶段持续运行时被调用，直到所有同一优先级的阶段均希望结束运行。
@@ -61,14 +64,14 @@ public class Phase implements IReusable {
      * Invoke when phase running, until all phases in the same time need be ended the runs.
      */
     @Builder.Default
-    Supplier<Boolean> onTick = () -> true;
+    Function<AbstractGame, Boolean> onTick = (_ignored) -> true;
     /**
      * 当阶段结束时被调用。
      * <p>
      * Invoked when phase ended it run.
      */
     @Builder.Default
-    Runnable onEnd = () -> {
+    Consumer<AbstractGame> onEnd = (_ignored) -> {
     };
 
     /**
@@ -119,20 +122,20 @@ public class Phase implements IReusable {
      * @return whether enter next <b>flow</b> or not
      * @see Phase
      */
-    public boolean tick() {
+    public boolean tick(AbstractGame game) {
         if (!isStartFinish) {
-            onStart.run();
+            onStart.accept(game);
             isStartFinish = true;
             return false;
         }
 
         if (!isTickFinish) {
-            isTickFinish = onTick.get();
+            isTickFinish = onTick.apply(game);
             return false;
         }
 
         if (!isEndFinish) {
-            onEnd.run();
+            onEnd.accept(game);
             isEndFinish = true;
             return false;
         }

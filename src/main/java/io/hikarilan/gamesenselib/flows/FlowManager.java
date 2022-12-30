@@ -3,6 +3,7 @@ package io.hikarilan.gamesenselib.flows;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.hikarilan.gamesenselib.artifacts.IReusable;
+import io.hikarilan.gamesenselib.games.AbstractGame;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.var;
@@ -23,8 +24,8 @@ import java.util.function.Supplier;
  * <br/>
  * 位于最低优先级的流程将会首先运行，然后是更高优先级的流程被运行，直到所有优先级的流程被运行完毕；
  * <br/>
- * 单个流程可以被看作并行的运行其包含的所有阶段内的 {@link Phase#tick()} 方法，而其返回值将会共同决定是否进入下一个流程，
- * 当且仅当该流程所有阶段的 {@link Phase#tick()} 方法均返回 <code>true</code>，即所有阶段均已结束时，才会进入下一个流程。
+ * 单个流程可以被看作并行的运行其包含的所有阶段内的 {@link Phase#tick(AbstractGame)} 方法，而其返回值将会共同决定是否进入下一个流程，
+ * 当且仅当该流程所有阶段的 {@link Phase#tick(AbstractGame)} 方法均返回 <code>true</code>，即所有阶段均已结束时，才会进入下一个流程。
  * <p>
  * Represents a flow manager, usually held by a game instance, responsible for managing the game flow.
  * <br/>
@@ -34,14 +35,16 @@ import java.util.function.Supplier;
  * <br/>
  * Flow at the lowest priority will be run first, then higher priority flow will be run until all priority flows have been run;
  * <br/>
- * A single flow can be regarded as running {@link Phase#tick()} methods in all phases in parallel,
+ * A single flow can be regarded as running {@link Phase#tick(AbstractGame)} methods in all phases in parallel,
  * and its return value will jointly determine whether to enter the next flow,
- * Only when all the {@link Phase#tick()} method in the phases return <code>true</code>, i.e. all the phase in the flow ended,
+ * Only when all the {@link Phase#tick(AbstractGame)} method in the phases return <code>true</code>, i.e. all the phase in the flow ended,
  * the next flow will be entered.
  */
 @SuppressWarnings("unused")
 @RequiredArgsConstructor
 public class FlowManager implements IReusable {
+
+    private final AbstractGame game;
 
     private final Map<Integer, List<Phase>> flows;
 
@@ -81,7 +84,7 @@ public class FlowManager implements IReusable {
      * @return Should enter next flow.
      * @see FlowManager
      */
-    private boolean tick() {
+    public boolean tick() {
         AtomicBoolean isFinish = new AtomicBoolean(true);
 
         // get current flow
@@ -91,7 +94,7 @@ public class FlowManager implements IReusable {
         if (flow != null) {
             flow.forEach(it -> {
                 // if any phase return false, the flow will be considered unfinished.
-                if (!it.tick()) isFinish.set(false);
+                if (!it.tick(game)) isFinish.set(false);
             });
         }
 
@@ -114,13 +117,20 @@ public class FlowManager implements IReusable {
     }
 
     @NotNull
-    public static PhaseManagerBuilder builder() {
-        return new PhaseManagerBuilder();
+    public static FlowManager.FlowManagerBuilder builder() {
+        return new FlowManagerBuilder();
     }
 
     @ToString
-    public static class PhaseManagerBuilder {
+    public static class FlowManagerBuilder {
+
+        private AbstractGame game;
         private final Map<Integer, List<Phase>> flows = Maps.newConcurrentMap();
+
+        public FlowManager.FlowManagerBuilder $game(AbstractGame game) {
+            this.game = game;
+            return this;
+        }
 
         /**
          * 为指定优先级的游戏流程添加游戏阶段
@@ -132,7 +142,7 @@ public class FlowManager implements IReusable {
          * @return this builder
          */
         @NotNull
-        public PhaseManagerBuilder addPhase(int priority, @NotNull Supplier<@NotNull Phase> supplier) {
+        public FlowManager.FlowManagerBuilder addPhase(int priority, @NotNull Supplier<@NotNull Phase> supplier) {
             flows.putIfAbsent(priority, Lists.newArrayList());
             flows.get(priority).add(supplier.get());
             return this;
@@ -148,15 +158,21 @@ public class FlowManager implements IReusable {
          * @return this builder
          */
         @NotNull
-        public PhaseManagerBuilder addAllPhase(int priority, @NotNull Supplier<@NotNull Collection<@NotNull Phase>> supplier) {
+        public FlowManager.FlowManagerBuilder addAllPhase(int priority, @NotNull Supplier<@NotNull Collection<@NotNull Phase>> supplier) {
             flows.putIfAbsent(priority, Lists.newArrayList());
             flows.get(priority).addAll(supplier.get());
             return this;
         }
 
+        /**
+         * @throws IllegalStateException if game is null
+         */
         @NotNull
         public FlowManager build() {
-            return new FlowManager(flows);
+            if (game == null) {
+                throw new IllegalStateException("Game instance is not set.");
+            }
+            return new FlowManager(game, flows);
         }
 
     }
