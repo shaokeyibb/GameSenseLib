@@ -115,6 +115,8 @@ public abstract class AbstractPlayer implements IConsumerQueueHolder<Player> {
 
     /**
      * 查询该 {@link AbstractPlayer} 对象是否包装了指定的 {@link Player} 对象
+     * <p>
+     * Check whether the {@link AbstractPlayer} object wraps the specified {@link Player} object
      *
      * @param other the other player
      * @return {@code true} if this {@link AbstractPlayer} object wraps the specified {@link Player} object
@@ -122,6 +124,19 @@ public abstract class AbstractPlayer implements IConsumerQueueHolder<Player> {
     @Internal
     public boolean isWrapper(Player other) {
         return uniqueId.equals(other.getUniqueId());
+    }
+
+    /**
+     * 查询该 {@link AbstractPlayer} 对象是否属于指定的 {@link AbstractGame} 对象
+     * <p>
+     * Check whether the {@link AbstractPlayer} object belongs to the specified {@link AbstractGame} object
+     *
+     * @param game the game
+     * @return {@code true} if this {@link AbstractPlayer} object belongs to the specified {@link AbstractGame} object
+     */
+    @Internal
+    public boolean isWrapper(AbstractGame game) {
+        return this.game == game;
     }
 
     /**

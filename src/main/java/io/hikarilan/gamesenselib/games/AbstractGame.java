@@ -190,6 +190,32 @@ public abstract class AbstractGame implements IReusable, IModuleHolder, IGameEve
     }
 
     /**
+     * 将指定玩家实例添加到当前游戏实例中。
+     * <p>
+     * Add the specified player instance to the current game instance.
+     *
+     * @param player the player to add
+     */
+    public void addPlayer(AbstractPlayer player) {
+        if (!player.isWrapper(this))
+            throw new IllegalArgumentException("The player is not belongs to this game instance.");
+        players.add(player);
+    }
+
+    /**
+     * 将指定玩家实例从当前游戏实例中移除。
+     * <p>
+     * Remove the specified player instance from the current game instance.
+     *
+     * @param player the player to remove
+     */
+    public void removePlayer(AbstractPlayer player) {
+        if (!player.isWrapper(this))
+            throw new IllegalArgumentException("The player is not belongs to this game instance.");
+        players.remove(player);
+    }
+
+    /**
      * 安装所有已捆绑模块。
      * <br/>
      * 已捆绑模块会在游戏实例创建时自动加载，用于完成一些基本功能。
