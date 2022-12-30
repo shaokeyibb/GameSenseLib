@@ -3,6 +3,7 @@ package io.hikarilan.gamesenselib.games;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
+import io.hikarilan.gamesenselib.annotations.Internal;
 import io.hikarilan.gamesenselib.artifacts.IReusable;
 import io.hikarilan.gamesenselib.events.IGameEventBus;
 import io.hikarilan.gamesenselib.events.IGameListener;
@@ -10,6 +11,7 @@ import io.hikarilan.gamesenselib.flows.FlowManager;
 import io.hikarilan.gamesenselib.modules.IModule;
 import io.hikarilan.gamesenselib.modules.IModuleHolder;
 import io.hikarilan.gamesenselib.modules.bundled.BukkitEventMapperModule;
+import io.hikarilan.gamesenselib.modules.bundled.FlowTickModule;
 import io.hikarilan.gamesenselib.modules.bundled.ModuleTickModule;
 import io.hikarilan.gamesenselib.players.AbstractPlayer;
 import lombok.Getter;
@@ -39,6 +41,8 @@ public abstract class AbstractGame implements IReusable, IModuleHolder, IGameEve
      * <p>
      * The flow manager of this game instance.
      */
+    @Getter
+    @Internal
     private final FlowManager flowManager;
 
     /**
@@ -196,6 +200,7 @@ public abstract class AbstractGame implements IReusable, IModuleHolder, IGameEve
      */
     protected void installBundledModules() {
         installModule(new ModuleTickModule(plugin, this));
+        installModule(new FlowTickModule(this));
         installModule(new BukkitEventMapperModule(plugin, this));
     }
 
