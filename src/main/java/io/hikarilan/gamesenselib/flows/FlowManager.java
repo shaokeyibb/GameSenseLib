@@ -135,9 +135,9 @@ public class FlowManager implements IReusable {
         }
 
         /**
-         * 为指定优先级的游戏流程添加游戏阶段
+         * 为指定优先级的游戏流程添加游戏阶段，优先级应大于等于 0。
          * <p>
-         * Add phase to specify flow of priority
+         * Add phase to specify flow of priority, priority should start from 0.
          *
          * @param priority priority of the flow
          * @param supplier phase function
@@ -145,15 +145,16 @@ public class FlowManager implements IReusable {
          */
         @NotNull
         public FlowManager.FlowManagerBuilder addPhase(int priority, @NotNull Supplier<@NotNull Phase> supplier) {
+            if (priority < 0) throw new IllegalArgumentException("Priority should start from 0.");
             flows.putIfAbsent(priority, Lists.newArrayList());
             flows.get(priority).add(supplier.get());
             return this;
         }
 
         /**
-         * 为指定优先级的游戏流程添加游戏阶段
+         * 为指定优先级的游戏流程添加游戏阶段，优先级应大于等于 0。
          * <p>
-         * Add phases to specify flow of priority
+         * Add phases to specify flow of priority, priority should start from 0.
          *
          * @param priority priority of the flow
          * @param supplier phases function
@@ -161,6 +162,7 @@ public class FlowManager implements IReusable {
          */
         @NotNull
         public FlowManager.FlowManagerBuilder addAllPhase(int priority, @NotNull Supplier<@NotNull Collection<@NotNull Phase>> supplier) {
+            if (priority < 0) throw new IllegalArgumentException("Priority should start from 0.");
             flows.putIfAbsent(priority, Lists.newArrayList());
             flows.get(priority).addAll(supplier.get());
             return this;
