@@ -1,11 +1,12 @@
 package io.hikarilan.gamesenselib.modules.extra;
 
 import io.hikarilan.gamesenselib.events.game.PlayerAttemptToJoinGameEvent;
-import io.hikarilan.gamesenselib.events.game.PlayerJoinGameEvent;
+import io.hikarilan.gamesenselib.events.game.PlayerPreJoinGameEvent;
 import io.hikarilan.gamesenselib.games.AbstractGame;
 import io.hikarilan.gamesenselib.modules.IModule;
 import io.hikarilan.gamesenselib.players.extra.DefaultGamePlayer;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -51,10 +52,11 @@ public class IndependentPlayerJoinGameModule implements IModule, Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        if (game.postEvent(new PlayerAttemptToJoinGameEvent(game, e.getPlayer())).isCancelled()) {
+        val event = new PlayerAttemptToJoinGameEvent(game, e.getPlayer());
+        if (game.postEvent(event).isCancelled()) {
             e.getPlayer().kickPlayer("Game has been started or the game is full.");
         } else {
-            game.postEvent(new PlayerJoinGameEvent(game, new DefaultGamePlayer(game, e.getPlayer())));
+            game.postEvent(new PlayerPreJoinGameEvent(game, event.getGamePlayer() == null ? new DefaultGamePlayer(game, e.getPlayer()) : event.getGamePlayer()));
         }
     }
 }

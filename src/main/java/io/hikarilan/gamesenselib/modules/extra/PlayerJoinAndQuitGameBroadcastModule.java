@@ -1,8 +1,8 @@
 package io.hikarilan.gamesenselib.modules.extra;
 
 
-import io.hikarilan.gamesenselib.events.game.PlayerJoinGameEvent;
-import io.hikarilan.gamesenselib.events.game.PlayerQuitGameEvent;
+import io.hikarilan.gamesenselib.events.game.PlayerPostJoinGameEvent;
+import io.hikarilan.gamesenselib.events.game.PlayerPostQuitGameEvent;
 import io.hikarilan.gamesenselib.games.AbstractGame;
 import io.hikarilan.gamesenselib.modules.AbstractListenerModule;
 import io.hikarilan.gamesenselib.players.AbstractPlayer;
@@ -57,14 +57,14 @@ public class PlayerJoinAndQuitGameBroadcastModule extends AbstractListenerModule
     }
 
     @Subscribe
-    public void onPlayerJoinGame(PlayerJoinGameEvent e) {
+    public void onPlayerJoinGame(PlayerPostJoinGameEvent e) {
         if (joinMessage == null) return;
         val message = joinMessage.apply(e.getPlayer());
         getGame().getPlayers(true).forEach(player -> player.sendMessage(message));
     }
 
     @Subscribe
-    public void onPlayerQuitGame(PlayerQuitGameEvent e) {
+    public void onPlayerQuitGame(PlayerPostQuitGameEvent e) {
         if (quitMessage == null) return;
         val message = quitMessage.apply(e.getPlayer());
         getGame().getPlayers(true).forEach(player -> player.sendMessage(message));

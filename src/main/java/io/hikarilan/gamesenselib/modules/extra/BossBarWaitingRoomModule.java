@@ -1,9 +1,7 @@
 package io.hikarilan.gamesenselib.modules.extra;
 
 import com.google.common.collect.Maps;
-import io.hikarilan.gamesenselib.events.game.PlayerAttemptToJoinGameEvent;
-import io.hikarilan.gamesenselib.events.game.PlayerJoinGameEvent;
-import io.hikarilan.gamesenselib.events.game.PlayerQuitGameEvent;
+import io.hikarilan.gamesenselib.events.game.*;
 import io.hikarilan.gamesenselib.games.AbstractGame;
 import io.hikarilan.gamesenselib.modules.AbstractListenerModule;
 import io.hikarilan.gamesenselib.players.AbstractPlayer;
@@ -264,12 +262,12 @@ public class BossBarWaitingRoomModule extends AbstractListenerModule {
     @Subscribe
     public void onAttemptToJoin(PlayerAttemptToJoinGameEvent e) {
         val playerCount = getGame().getPlayers(true, ingamePlayerClass).size();
-        if (playerCount < maxPlayerCount) return;
-        e.setCancelled(true);
+        if (playerCount >= maxPlayerCount) return;
+        e.setCancelled(false);
     }
 
-    @Subscribe(priority = 10) // this need to called early to make sure the player is in the game
-    public void onPlayerJoinGame(PlayerJoinGameEvent e) {
+    @Subscribe
+    public void onPlayerJoinGame(PlayerPreJoinGameEvent e) {
         e.getPlayer().runWhenOnline(player -> timerBossbar.addPlayer(player));
 
         if (lobbyLocation != null) {
@@ -277,10 +275,12 @@ public class BossBarWaitingRoomModule extends AbstractListenerModule {
         }
 
         getGame().addPlayer(e.getPlayer());
+
+        getGame().postEvent(new PlayerPostJoinGameEvent(e.getGame(), e.getPlayer()));
     }
 
-    @Subscribe(priority = 10) // this need to called early to make sure the player is not in the game
-    public void onPlayerQuitGame(PlayerQuitGameEvent e) {
+    @Subscribe
+    public void onPlayerQuitGame(PlayerPreQuitGameEvent e) {
         e.getPlayer().runWhenOnline(player -> timerBossbar.removePlayer(player));
 
         if (pastLocations.containsKey(e.getPlayer())) {
@@ -288,6 +288,8 @@ public class BossBarWaitingRoomModule extends AbstractListenerModule {
         }
 
         getGame().removePlayer(e.getPlayer());
+
+        getGame().postEvent(new PlayerPostQuitGameEvent(e.getGame(), e.getPlayer()));
     }
 
     private enum Status {

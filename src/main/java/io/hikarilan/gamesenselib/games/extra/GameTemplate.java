@@ -5,9 +5,7 @@ import io.hikarilan.gamesenselib.flows.FlowManager;
 import io.hikarilan.gamesenselib.flows.Phase;
 import io.hikarilan.gamesenselib.flows.extra.ExtraPhases;
 import io.hikarilan.gamesenselib.games.AbstractGame;
-import io.hikarilan.gamesenselib.modules.extra.IndependentPlayerJoinGameModule;
-import io.hikarilan.gamesenselib.modules.extra.PlayerJoinAndQuitGameBroadcastModule;
-import io.hikarilan.gamesenselib.modules.extra.WorldPlayerJoinGameModule;
+import io.hikarilan.gamesenselib.modules.extra.*;
 import io.hikarilan.gamesenselib.players.AbstractPlayer;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -41,6 +39,16 @@ public class GameTemplate {
     private final FlowManager.FlowManagerBuilder flowManagerBuilder = FlowManager.builder();
 
     private final Plugin plugin;
+
+    /**
+     * @see #setRemovePlayerOnQuit(boolean)
+     */
+    private boolean removePlayerOnQuit = true;
+
+    /**
+     * @see #setAllowRejoinPlayer(boolean)
+     */
+    private boolean allowRejoinPlayer = false;
 
     /**
      * 为指定优先级的游戏流程添加游戏阶段，优先级应大于等于 0。
@@ -124,6 +132,48 @@ public class GameTemplate {
     }
 
     /**
+     * 当游戏开始后，移除退出游戏玩家的玩家实例（默认启用）
+     * <br/>
+     * 默认情况下，当游戏开始后，玩家做出退出游戏的行为时，游戏实例并不会做出任何动作。
+     * <br/>
+     * 开启此设置后，当玩家退出游戏时，游戏实例会移除该玩家的玩家实例（即在技术上令该玩家退出游戏）。
+     * <p>
+     * When the game starts, remove the player instance of the player who quit the game (enabled by default)
+     * <br/>
+     * By default, when the game starts,
+     * the game instance does not take any action when the player makes a quit game action.
+     * <br/>
+     * After enabling this setting, when the player quits the game,
+     * the game instance will remove the player instance of the player (that is, technically make the player quit the game).
+     *
+     * @see IngamePlayerImmediatelyQuitGameModule
+     */
+    public GameTemplate setRemovePlayerOnQuit(boolean removePlayerOnQuit) {
+        this.removePlayerOnQuit = removePlayerOnQuit;
+        return this;
+    }
+
+    /**
+     * 当玩家退出游戏后，允许玩家重新加入游戏（默认关闭）
+     * <br/>
+     * 启用此项，当玩家退出游戏后，玩家的玩家实例将依然保留在游戏实例中。
+     * <br/>
+     * 当玩家试图重新加入游戏时，其将被允许回到游戏中。
+     * <p>
+     * When the player quits the game,
+     * allow the player to rejoin the game (default disabled)
+     * <br/>
+     * Enable this item, when the player quits the game,
+     * the player's player instance will still be retained in the game instance.
+     * <br/>
+     * When the player tries to rejoin the game, he will be allowed to return to the game.
+     */
+    public GameTemplate setAllowRejoinPlayer(boolean allowRejoinPlayer) {
+        this.allowRejoinPlayer = allowRejoinPlayer;
+        return this;
+    }
+
+    /**
      * 创建一个共享游戏实例
      * <br/>
      * 一个共享游戏实例可在单个服务端实例中存在多个，
@@ -137,6 +187,7 @@ public class GameTemplate {
      * @return shared game template
      */
     public SharedGameTemplate shared() {
+        applySettings();
         return new SharedGameTemplate(this);
     }
 
@@ -154,6 +205,7 @@ public class GameTemplate {
      * @return independent game template
      */
     public WorldGameTemplate world(World world) {
+        applySettings();
         return new WorldGameTemplate(this, world);
     }
 
@@ -171,7 +223,18 @@ public class GameTemplate {
      * @return independent game template
      */
     public IndependentGameTemplate independent() {
+        applySettings();
         return new IndependentGameTemplate(this);
+    }
+
+    private void applySettings() {
+        if (removePlayerOnQuit) {
+            flowManagerBuilder.addPhase(1, () -> Phase.builder().onStart(it -> it.installModule(new IngamePlayerImmediatelyQuitGameModule(it, !allowRejoinPlayer))).build());
+        }
+        if (allowRejoinPlayer) {
+            // make sure the module is added after the game starts
+            flowManagerBuilder.addPhase(1, () -> Phase.builder().onStart(it -> it.installModule(new IngamePlayerRejoinGameModule(it))).build());
+        }
     }
 
     /**

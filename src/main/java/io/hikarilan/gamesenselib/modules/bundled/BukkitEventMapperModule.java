@@ -1,6 +1,6 @@
 package io.hikarilan.gamesenselib.modules.bundled;
 
-import io.hikarilan.gamesenselib.events.game.PlayerQuitGameEvent;
+import io.hikarilan.gamesenselib.events.game.PlayerPreQuitGameEvent;
 import io.hikarilan.gamesenselib.games.AbstractGame;
 import io.hikarilan.gamesenselib.modules.IModule;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +62,6 @@ public class BukkitEventMapperModule implements IModule, Listener {
         val player = game.findPlayer(e.getPlayer());
         if (player == null) return;
         // Call event
-        game.postEvent(new PlayerQuitGameEvent(game, player));
+        game.postEvent(new PlayerPreQuitGameEvent(game, player));
     }
 }

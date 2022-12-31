@@ -62,6 +62,18 @@ public abstract class AbstractPlayer implements IConsumerQueueHolder<Player> {
     private final UUID uniqueId;
 
     /**
+     * 玩家实例是否已被销毁。
+     * <br/>
+     * 一个已被销毁的玩家实例不应再被使用，相反，他们应被立即丢弃。
+     * <p>
+     * Whether the player instance has been destroyed.
+     * <br/>
+     * A destroyed player instance should not be used again, instead, they should be discarded immediately.
+     */
+    @Getter
+    private boolean destroyed = false;
+
+    /**
      * 获取玩家的名字（与 {@link Player#getName()} 相同）。
      * <p>
      * Get the name of the player (same as {@link Player#getName()}).
@@ -257,6 +269,8 @@ public abstract class AbstractPlayer implements IConsumerQueueHolder<Player> {
      * This will reset all the states of this player
      */
     public void destroy() {
+        destroyed = true;
+
         consumerQueue.clear();
 
         // rollback player information (use consumer queue when player offline)

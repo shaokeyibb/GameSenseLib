@@ -1,8 +1,8 @@
 package io.hikarilan.gamesenselib.modules.extra;
 
 import io.hikarilan.gamesenselib.events.game.PlayerAttemptToJoinGameEvent;
-import io.hikarilan.gamesenselib.events.game.PlayerJoinGameEvent;
-import io.hikarilan.gamesenselib.events.game.PlayerQuitGameEvent;
+import io.hikarilan.gamesenselib.events.game.PlayerPreJoinGameEvent;
+import io.hikarilan.gamesenselib.events.game.PlayerPreQuitGameEvent;
 import io.hikarilan.gamesenselib.games.AbstractGame;
 import io.hikarilan.gamesenselib.modules.IModule;
 import io.hikarilan.gamesenselib.players.extra.DefaultGamePlayer;
@@ -14,6 +14,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,12 +57,14 @@ public class WorldPlayerJoinGameModule implements IModule, Listener {
     }
 
     @EventHandler
-    public void onPlayerEnterWorld(PlayerChangedWorldEvent e) {
-        if (e.getPlayer().getWorld() != world) return;
-        if (game.postEvent(new PlayerAttemptToJoinGameEvent(game, e.getPlayer())).isCancelled()) {
-            e.getPlayer().kickPlayer("Game has been started or the game is full.");
+    public void onPlayerEnterWorld(PlayerTeleportEvent e) {
+        if (e.getTo().getWorld() != world) return;
+        val event = game.postEvent(new PlayerAttemptToJoinGameEvent(game, e.getPlayer()));
+        if (event.isCancelled()) {
+            e.setCancelled(true);
+            e.getPlayer().sendMessage("Game has been started or the game is full.");
         } else {
-            game.postEvent(new PlayerJoinGameEvent(game, new DefaultGamePlayer(game, e.getPlayer())));
+            game.postEvent(new PlayerPreJoinGameEvent(game, event.getGamePlayer() == null ? new DefaultGamePlayer(game, e.getPlayer()) : event.getGamePlayer()));
         }
     }
 
@@ -69,7 +73,18 @@ public class WorldPlayerJoinGameModule implements IModule, Listener {
         if (e.getFrom() != world) return;
         val player = game.findPlayer(e.getPlayer());
         if (player == null) return;
-        game.postEvent(new PlayerQuitGameEvent(game, player));
+        game.postEvent(new PlayerPreQuitGameEvent(game, player));
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        if (e.getPlayer().getWorld() != world) return;
+        val event = game.postEvent(new PlayerAttemptToJoinGameEvent(game, e.getPlayer()));
+        if (event.isCancelled()) {
+            e.getPlayer().sendMessage("Game has been started or the game is full.");
+        } else {
+            game.postEvent(new PlayerPreJoinGameEvent(game, event.getGamePlayer() == null ? new DefaultGamePlayer(game, e.getPlayer()) : event.getGamePlayer()));
+        }
     }
 
 }
