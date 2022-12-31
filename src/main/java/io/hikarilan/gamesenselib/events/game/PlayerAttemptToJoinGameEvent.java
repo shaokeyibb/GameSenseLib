@@ -32,8 +32,5 @@ public class PlayerAttemptToJoinGameEvent extends AbstractCancellableGameEvent {
     public PlayerAttemptToJoinGameEvent(AbstractGame game, Player player) {
         super(game);
         this.player = player;
-
-        // deny join by default
-        setCancelled(true);
     }
 }
