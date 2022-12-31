@@ -2,7 +2,6 @@ package io.hikarilan.gamesenselib.games;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.eventbus.EventBus;
 import io.hikarilan.gamesenselib.annotations.Internal;
 import io.hikarilan.gamesenselib.artifacts.IReusable;
 import io.hikarilan.gamesenselib.events.IGameEventBus;
@@ -17,6 +16,7 @@ import io.hikarilan.gamesenselib.players.AbstractPlayer;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,9 +55,10 @@ public abstract class AbstractGame implements IReusable, IModuleHolder, IGameEve
     @Getter
     private final Set<IGameListener> handlerList = Sets.newHashSet();
 
-    @SuppressWarnings("UnstableApiUsage")
     @Getter
-    private final EventBus eventBus = new EventBus();
+    private final EventBus eventBus = EventBus.builder()
+            .eventInheritance(false)
+            .build();
 
     @Getter
     private final Map<Class<? extends IModule>, IModule> installedModules = Maps.newHashMap();

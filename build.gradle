@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.7.20'
     id 'org.jetbrains.dokka' version '1.7.20'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
 group = 'io.hikarilan'
@@ -27,10 +28,12 @@ dependencies {
 
     implementation 'org.jetbrains:annotations:16.0.2'
 
+    implementation 'org.greenrobot:eventbus-java:3.3.1'
+
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 
-    dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.7.20")
+    dokkaHtmlPlugin 'org.jetbrains.dokka:kotlin-as-java-plugin:1.7.20'
 }
 
 def targetJavaVersion = 8
@@ -56,4 +59,17 @@ processResources {
     filesMatching('plugin.yml') {
         expand props
     }
+}
+
+artifacts {
+    archives shadowJar
+}
+
+shadowJar {
+    dependencies {
+        exclude '*kotlin*'
+    }
+    relocate('org.greenrobot.eventbus', 'io.hikarilan.gamesenselib.shadow.org.greenrobot.eventbus')
+    relocate('org.jetbrains.annotations', 'io.hikarilan.gamesenselib.shadow.org.jetbrains.annotations')
+    minimize()
 }

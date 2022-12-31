@@ -1,6 +1,6 @@
 package io.hikarilan.gamesenselib.events;
 
-import com.google.common.eventbus.EventBus;
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.Set;
 
@@ -15,7 +15,7 @@ import java.util.Set;
  * <br/>
  * A game instance has a fixed event bus, which can avoid confusion with events published by other game instances.
  */
-@SuppressWarnings({"UnstableApiUsage", "unused"})
+@SuppressWarnings("unused")
 public interface IGameEventBus {
 
     /**
@@ -26,9 +26,9 @@ public interface IGameEventBus {
     Set<IGameListener> getHandlerList();
 
     /**
-     * Guava 事件总线实例。
+     * 事件总线实例。
      * <p>
-     * Guava event bus instance.
+     * Event bus instance.
      */
     EventBus getEventBus();
 

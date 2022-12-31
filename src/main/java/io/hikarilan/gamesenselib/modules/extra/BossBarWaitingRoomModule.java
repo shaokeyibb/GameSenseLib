@@ -1,7 +1,6 @@
 package io.hikarilan.gamesenselib.modules.extra;
 
 import com.google.common.collect.Maps;
-import com.google.common.eventbus.Subscribe;
 import io.hikarilan.gamesenselib.events.game.PlayerAttemptToJoinGameEvent;
 import io.hikarilan.gamesenselib.events.game.PlayerJoinGameEvent;
 import io.hikarilan.gamesenselib.events.game.PlayerQuitGameEvent;
@@ -15,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.greenrobot.eventbus.Subscribe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,7 +46,7 @@ import java.util.Map;
  * <br/>
  * When the waiting room is full, the event will be canceled.
  */
-@SuppressWarnings({"unused", "UnstableApiUsage"})
+@SuppressWarnings("unused")
 public class BossBarWaitingRoomModule extends AbstractListenerModule {
 
     /**
@@ -268,7 +268,7 @@ public class BossBarWaitingRoomModule extends AbstractListenerModule {
         e.setCancelled(true);
     }
 
-    @Subscribe
+    @Subscribe(priority = 10) // this need to called early to make sure the player is in the game
     public void onPlayerJoinGame(PlayerJoinGameEvent e) {
         e.getPlayer().runWhenOnline(player -> timerBossbar.addPlayer(player));
 
@@ -279,7 +279,7 @@ public class BossBarWaitingRoomModule extends AbstractListenerModule {
         getGame().addPlayer(e.getPlayer());
     }
 
-    @Subscribe
+    @Subscribe(priority = 10) // this need to called early to make sure the player is not in the game
     public void onPlayerQuitGame(PlayerQuitGameEvent e) {
         e.getPlayer().runWhenOnline(player -> timerBossbar.removePlayer(player));
 

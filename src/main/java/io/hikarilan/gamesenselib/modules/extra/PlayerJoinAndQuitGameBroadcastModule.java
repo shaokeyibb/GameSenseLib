@@ -1,12 +1,13 @@
 package io.hikarilan.gamesenselib.modules.extra;
 
-import com.google.common.eventbus.Subscribe;
+
 import io.hikarilan.gamesenselib.events.game.PlayerJoinGameEvent;
 import io.hikarilan.gamesenselib.events.game.PlayerQuitGameEvent;
 import io.hikarilan.gamesenselib.games.AbstractGame;
 import io.hikarilan.gamesenselib.modules.AbstractListenerModule;
 import io.hikarilan.gamesenselib.players.AbstractPlayer;
 import lombok.val;
+import org.greenrobot.eventbus.Subscribe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +22,7 @@ import java.util.function.Function;
  * <br/>
  * When a player joins or quits the server, a message will be broadcast to all players in this game instance.
  */
-@SuppressWarnings({"unused", "UnstableApiUsage"})
+@SuppressWarnings("unused")
 public class PlayerJoinAndQuitGameBroadcastModule extends AbstractListenerModule {
     @Nullable
     private final Function<AbstractPlayer, String> joinMessage;
