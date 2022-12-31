@@ -6,7 +6,9 @@ import io.hikarilan.gamesenselib.flows.Phase;
 import io.hikarilan.gamesenselib.flows.extra.ExtraPhases;
 import io.hikarilan.gamesenselib.games.AbstractGame;
 import io.hikarilan.gamesenselib.modules.extra.IndependentPlayerJoinGameModule;
+import io.hikarilan.gamesenselib.modules.extra.PlayerJoinAndQuitGameBroadcastModule;
 import io.hikarilan.gamesenselib.modules.extra.WorldPlayerJoinGameModule;
+import io.hikarilan.gamesenselib.players.AbstractPlayer;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bukkit.Location;
@@ -18,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -98,6 +101,29 @@ public class GameTemplate {
     }
 
     /**
+     * 添加一个广播模块，当玩家加入服务器或退出服务器时，将会为所有在此游戏实例内的玩家广播一条消息。
+     * <br/>
+     * 如果 {@code joinMessage} 为 {@code null}，则不会广播玩家加入游戏的消息。
+     * <br/>
+     * 如果 {@code quitMessage} 为 {@code null}，则不会广播玩家退出游戏的消息。
+     * <p>
+     * Add a broadcast module, when a player joins the server or exits the server,
+     * a message will be broadcast to all players in this game instance.
+     * <br/>
+     * If {@code joinMessage} is {@code null}, the player will not broadcast the message when joining the game.
+     * <br/>
+     * If {@code quitMessage} is {@code null}, the player will not broadcast the message when exiting the game.
+     *
+     * @param joinMessage format of join message, or {@code null} if no message should be broadcast
+     * @param quitMessage format of quit message, or {@code null} if no message should be broadcast
+     */
+    public GameTemplate withBroadcastMessagePlayerJoinAndQuit(@Nullable Function<AbstractPlayer, String> joinMessage,
+                                                              @Nullable Function<AbstractPlayer, String> quitMessage) {
+        gameConfigurators.add(new PlayerJoinAndQuitGameBroadcastConfigurator(joinMessage, quitMessage));
+        return this;
+    }
+
+    /**
      * 创建一个共享游戏实例
      * <br/>
      * 一个共享游戏实例可在单个服务端实例中存在多个，
@@ -156,7 +182,7 @@ public class GameTemplate {
      * @param game game instance
      */
     private void applyConfigurators(AbstractGame game) {
-        gameConfigurators.forEach(configurator -> configurator.configure(game));
+        gameConfigurators.forEach(configurator -> configurator.configure(plugin, game));
     }
 
     @RequiredArgsConstructor
@@ -201,7 +227,20 @@ public class GameTemplate {
 
 
     protected interface GameConfigurator {
-        void configure(AbstractGame game);
+        void configure(Plugin plugin, AbstractGame game);
+    }
+
+    @RequiredArgsConstructor
+    public static class PlayerJoinAndQuitGameBroadcastConfigurator implements GameConfigurator {
+        @Nullable
+        private final Function<AbstractPlayer, String> joinMessage;
+        @Nullable
+        private final Function<AbstractPlayer, String> quitMessage;
+
+        @Override
+        public void configure(Plugin plugin, AbstractGame game) {
+            game.installModule(new PlayerJoinAndQuitGameBroadcastModule(game, joinMessage, quitMessage));
+        }
     }
 
 }
