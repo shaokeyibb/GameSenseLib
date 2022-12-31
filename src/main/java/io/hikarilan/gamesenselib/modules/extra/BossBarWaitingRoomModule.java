@@ -216,7 +216,7 @@ public class BossBarWaitingRoomModule extends AbstractListenerModule {
                 timerBossbar.setVisible(true);
                 if (playerCount < minPlayerCount) {
                     timer = Durations.toTick(countdown);
-                    timerBossbar.setTitle(null);
+                    timerBossbar.setTitle("Waiting more player join to start game...");
                     timerBossbar.setColor(BarColor.WHITE);
                     timerBossbar.setProgress(playerCount / (double) minPlayerCount);
                     return;
@@ -229,7 +229,8 @@ public class BossBarWaitingRoomModule extends AbstractListenerModule {
                     status = Status.INITIALING;
                     return;
                 }
-                timerBossbar.setColor(BarColor.RED);
+                timerBossbar.setTitle("Game will start in " + Durations.ofTick(timer).getSeconds() + "s");
+                timerBossbar.setColor(BarColor.GREEN);
                 timer--;
                 if (timer > 0) {
                     timerBossbar.setProgress(timer / (double) Durations.toTick(countdown));
