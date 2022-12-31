@@ -2,10 +2,12 @@ package io.hikarilan.gamesenselib.modules.extra;
 
 import io.hikarilan.gamesenselib.events.game.PlayerAttemptToJoinGameEvent;
 import io.hikarilan.gamesenselib.events.game.PlayerJoinGameEvent;
+import io.hikarilan.gamesenselib.events.game.PlayerQuitGameEvent;
 import io.hikarilan.gamesenselib.games.AbstractGame;
 import io.hikarilan.gamesenselib.modules.IModule;
 import io.hikarilan.gamesenselib.players.extra.DefaultGamePlayer;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -60,6 +62,14 @@ public class WorldPlayerJoinGameModule implements IModule, Listener {
         } else {
             game.postEvent(new PlayerJoinGameEvent(game, new DefaultGamePlayer(game, e.getPlayer())));
         }
+    }
+
+    @EventHandler
+    public void onPlayerLeaveWorld(PlayerChangedWorldEvent e) {
+        if (e.getFrom() != world) return;
+        val player = game.findPlayer(e.getPlayer());
+        if (player == null) return;
+        game.postEvent(new PlayerQuitGameEvent(game, player));
     }
 
 }
