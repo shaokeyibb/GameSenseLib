@@ -7,7 +7,6 @@ import io.hikarilan.gamesenselib.flows.extra.ExtraPhases;
 import io.hikarilan.gamesenselib.games.AbstractGame;
 import io.hikarilan.gamesenselib.modules.extra.IndependentPlayerJoinGameModule;
 import io.hikarilan.gamesenselib.modules.extra.WorldPlayerJoinGameModule;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.bukkit.Location;
@@ -31,7 +30,7 @@ import java.util.function.Supplier;
  * For higher custom requirements, we recommend that you directly extend the {@link AbstractGame} class
  */
 @SuppressWarnings("unused")
-@Builder
+@RequiredArgsConstructor(staticName = "of")
 public class GameTemplate {
 
     private final Set<GameConfigurator> gameConfigurators = Sets.newHashSet();
@@ -161,7 +160,7 @@ public class GameTemplate {
     }
 
     @RequiredArgsConstructor
-    protected static class SharedGameTemplate {
+    public static class SharedGameTemplate {
         @NotNull
         private final GameTemplate gameTemplate;
 
@@ -173,7 +172,7 @@ public class GameTemplate {
     }
 
     @RequiredArgsConstructor
-    protected static class WorldGameTemplate {
+    public static class WorldGameTemplate {
         @NotNull
         private final GameTemplate gameTemplate;
         @NotNull
@@ -188,7 +187,7 @@ public class GameTemplate {
     }
 
     @RequiredArgsConstructor
-    protected static class IndependentGameTemplate {
+    public static class IndependentGameTemplate {
         @NotNull
         private final GameTemplate gameTemplate;
 
