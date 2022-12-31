@@ -9,6 +9,8 @@ import io.hikarilan.gamesenselib.games.AbstractGame;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.val;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -191,6 +193,59 @@ public abstract class AbstractPlayer implements IConsumerQueueHolder<Player> {
     public void teleport(Location location) {
         runWhenOnline(player -> player.teleport(location));
     }
+
+    /**
+     * 发送一条信息给玩家。
+     * <p>
+     * Send a message to the player.
+     *
+     * @param message Message to be displayed
+     * @see Player#sendMessage(String)
+     */
+    public void sendMessage(String message) {
+        if (!isOnline()) return;
+        getRawPlayer().sendMessage(message);
+    }
+
+    /**
+     * 发送一条消息到此玩家的 Actionbar
+     * <p>
+     * Send a message to the Actionbar of this player
+     *
+     * @param message Message to be displayed in the Actionbar
+     */
+    public void sendActionBar(String message) {
+        if (!isOnline()) return;
+        getRawPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
+    }
+
+    /**
+     * 向播放器发送标题和副标题消息。
+     * 如果这两个值中的任何一个为空，它们将不会被发送并且显示将保持不变。
+     * 如果它们是空字符串，显示将被更新。
+     * 如果字符串包含新行，则仅发送第一行。
+     * 所有计时值都可以取值 -1 以指示它们将使用最后发送的值（如果没有显示过 title，则使用默认值）。
+     * <p>
+     * Sends a title and a subtitle message to the player. If either of these
+     * values are null, they will not be sent and the display will remain
+     * unchanged. If they are empty strings, the display will be updated as
+     * such. If the strings contain a new line, only the first line will be
+     * sent. All timings values may take a value of -1 to indicate that they
+     * will use the last value sent (or the defaults if no title has been
+     * displayed).
+     *
+     * @param title    Title text
+     * @param subtitle Subtitle text
+     * @param fadeIn   time in ticks for titles to fade in. Defaults to 10.
+     * @param stay     time in ticks for titles to stay. Defaults to 70.
+     * @param fadeOut  time in ticks for titles to fade out. Defaults to 20.
+     * @see Player#sendTitle(String, String, int, int, int)
+     */
+    public void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+        if (!isOnline()) return;
+        getRawPlayer().sendTitle(title, subtitle, fadeIn, stay, fadeOut);
+    }
+
 
     /**
      * 销毁此玩家实例
