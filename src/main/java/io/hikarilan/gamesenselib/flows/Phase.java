@@ -5,6 +5,7 @@ import io.hikarilan.gamesenselib.games.AbstractGame;
 import lombok.Builder;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
@@ -54,30 +55,36 @@ public class Phase implements IReusable {
      * <p>
      * Invoked when phase first run.
      */
-    @Builder.Default
-    Consumer<AbstractGame> onStart = (_ignored) -> {
-    };
+    Consumer<AbstractGame> onStart;
     /**
      * 当阶段持续运行时被调用，直到所有同一优先级的阶段均希望结束运行。
      * <p>
      * Invoke when phase running, until all phases in the same time need be ended the runs.
      */
-    @Builder.Default
-    Function<AbstractGame, Boolean> onTick = (_ignored) -> true;
+    Function<AbstractGame, Boolean> onTick;
     /**
      * 当阶段结束时被调用。
      * <p>
      * Invoked when phase ended it run.
      */
-    @Builder.Default
-    Consumer<AbstractGame> onEnd = (_ignored) -> {
-    };
+    Consumer<AbstractGame> onEnd;
 
     @Builder
-    public Phase(Consumer<AbstractGame> onStart, Function<AbstractGame, Boolean> onTick, Consumer<AbstractGame> onEnd) {
+    public Phase(@Nullable Consumer<AbstractGame> onStart, @Nullable Function<AbstractGame, Boolean> onTick, @Nullable Consumer<AbstractGame> onEnd) {
         this.onStart = onStart;
         this.onTick = onTick;
         this.onEnd = onEnd;
+        if (onStart == null) {
+            this.onStart = (_ignored) -> {
+            };
+        }
+        if (onTick == null) {
+            this.onTick = (_ignored) -> true;
+        }
+        if (onEnd == null) {
+            this.onEnd = (_ignored) -> {
+            };
+        }
     }
 
     /**
