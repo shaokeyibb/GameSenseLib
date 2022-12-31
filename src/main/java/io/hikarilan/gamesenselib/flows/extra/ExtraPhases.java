@@ -77,16 +77,7 @@ public class ExtraPhases {
                                                            @NotNull Duration countdown,
                                                            @Nullable Location lobbyLocation,
                                                            @Nullable Runnable onFinish) {
-        val blockingPhaseAndModule = blockingPhase();
-        AtomicReference<BossBarWaitingRoomModule> waitingRoomModule = new AtomicReference<>();
-        return Sets.newHashSet(blockingPhaseAndModule.getPhase(), Phase.builder()
-                .onStart(game -> {
-                            waitingRoomModule.set(new BossBarWaitingRoomModule(game, blockingPhaseAndModule.getModule(), minPlayerCount, maxPlayerCount, lobbyLocation, countdown, onFinish));
-                            game.installModule(waitingRoomModule.get());
-                        }
-                )
-                .onEnd(game -> game.uninstallModule(waitingRoomModule.get()))
-                .build());
+        return waitingForPlayersPhase(minPlayerCount, maxPlayerCount, countdown, lobbyLocation, onFinish, AbstractPlayer.class);
     }
 
     /**
@@ -122,6 +113,7 @@ public class ExtraPhases {
                             game.installModule(waitingRoomModule.get());
                         }
                 )
+                .onTick(game -> blockingPhaseAndModule.getModule().block())
                 .onEnd(game -> game.uninstallModule(waitingRoomModule.get()))
                 .build());
     }

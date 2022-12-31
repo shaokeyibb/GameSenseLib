@@ -20,7 +20,7 @@ public class PhaseBlockingModule implements IModule {
 
     @Override
     public void onInstall() {
-        blocking = false;
+        blocking = true;
     }
 
     @Override
@@ -39,6 +39,7 @@ public class PhaseBlockingModule implements IModule {
      * Check if it is blocked.
      *
      * @return blocked of not
+     * @see io.hikarilan.gamesenselib.flows.Phase
      */
     public boolean block() {
         return !blocking;
@@ -50,6 +51,6 @@ public class PhaseBlockingModule implements IModule {
      * Unlock the block.
      */
     public void unlock() {
-        blocking = true;
+        blocking = false;
     }
 }

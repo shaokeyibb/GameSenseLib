@@ -204,7 +204,6 @@ public class BossBarWaitingRoomModule extends AbstractListenerModule {
 
     private void onFinish() {
         phaseBlockingModule.unlock();
-        getGame().uninstallModule(this);
         if (onFinish != null) {
             onFinish.run();
         }
