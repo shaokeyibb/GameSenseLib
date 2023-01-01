@@ -30,6 +30,8 @@ dependencies {
 
     implementation 'org.greenrobot:eventbus-java:3.3.1'
 
+    implementation 'org.bstats:bstats-bukkit:3.0.0'
+
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 
@@ -69,7 +71,8 @@ shadowJar {
     dependencies {
         exclude '*kotlin*'
     }
-    relocate('org.greenrobot.eventbus', 'io.hikarilan.gamesenselib.shadow.org.greenrobot.eventbus')
-    relocate('org.jetbrains.annotations', 'io.hikarilan.gamesenselib.shadow.org.jetbrains.annotations')
+    relocate('org.greenrobot.eventbus', 'io.hikarilan.gamesenselib.shade.org.greenrobot.eventbus')
+    relocate('org.jetbrains.annotations', 'io.hikarilan.gamesenselib.shade.org.jetbrains.annotations')
+    relocate('org.bstats', 'io.hikarilan.gamesenselib.shade.org.bstats')
     minimize()
 }
