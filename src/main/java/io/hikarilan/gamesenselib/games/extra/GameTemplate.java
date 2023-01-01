@@ -56,6 +56,18 @@ public class GameTemplate {
     private boolean teleportPlayerOnQuit = true;
 
     /**
+     * @see #setJoinCommand(String)
+     */
+    @Nullable
+    private String joinCommand;
+
+    /**
+     * @see #setQuitCommand(String)
+     */
+    @Nullable
+    private String quitCommand = "quit";
+
+    /**
      * 为指定优先级的游戏流程添加游戏阶段，优先级应大于等于 0。
      * <br/>
      * 指定的优先级将会 +10，以便于 {@link GameTemplate} 注入游戏流程。
@@ -198,6 +210,44 @@ public class GameTemplate {
     }
 
     /**
+     * 允许玩家键入指定指令加入游戏（默认禁用）。
+     * <br/>
+     * 指令无须输入前缀。
+     * 设置为 {@code null} 以禁用此功能。
+     * <p>
+     * Allow players to type the specified command to join the game (disabled by default).
+     * <br/>
+     * The command does not need to enter the prefix.
+     * Set to {@code null} to disable this feature.
+     *
+     * @param joinCommand command to join the game
+     */
+    public GameTemplate setJoinCommand(@Nullable String joinCommand) {
+        if (joinCommand != null && joinCommand.isEmpty()) joinCommand = null;
+        this.joinCommand = joinCommand;
+        return this;
+    }
+
+    /**
+     * 允许玩家键入指定指令退出游戏（默认启用，默认值：{@code quit}）。
+     * <br/>
+     * 指令无须输入前缀。
+     * 设置为 {@code null} 以禁用此功能。
+     * <p>
+     * Allow players to type the specified command to quit the game (enabled by default, default value: {@code quit}).
+     * <br/>
+     * The command does not need to enter the prefix.
+     * Set to {@code null} to disable this feature.
+     *
+     * @param quitCommand command to quit the game
+     */
+    public GameTemplate setQuitCommand(@Nullable String quitCommand) {
+        if (quitCommand != null && quitCommand.isEmpty()) quitCommand = null;
+        this.quitCommand = quitCommand;
+        return this;
+    }
+
+    /**
      * 创建一个共享游戏实例
      * <br/>
      * 一个共享游戏实例可在单个服务端实例中存在多个，
@@ -267,6 +317,9 @@ public class GameTemplate {
                 gameConfigurators.add(new PlayerQuitGameTeleportingConfigurator(true));
             }
         }
+        if (joinCommand != null || quitCommand != null) {
+            gameConfigurators.add(new PlayerJoinAntQuitGameWithCommandConfigurator(joinCommand, quitCommand));
+        }
     }
 
     /**
@@ -282,6 +335,7 @@ public class GameTemplate {
 
     @RequiredArgsConstructor
     public static class SharedGameTemplate {
+
         @NotNull
         private final GameTemplate gameTemplate;
 
@@ -346,6 +400,20 @@ public class GameTemplate {
         @Override
         public void configure(Plugin plugin, AbstractGame game) {
             game.installModule(new PlayerQuitGameTeleportingModule(game, kickPlayer));
+        }
+    }
+
+    @RequiredArgsConstructor
+    public static class PlayerJoinAntQuitGameWithCommandConfigurator implements GameConfigurator {
+
+        @Nullable
+        private final String joinCommand;
+        @Nullable
+        private final String quitCommand;
+
+        @Override
+        public void configure(Plugin plugin, AbstractGame game) {
+            game.installModule(new PlayerJoinAndQuitGameWithCommandModule(plugin, game, joinCommand, quitCommand));
         }
     }
 
