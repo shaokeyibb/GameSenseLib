@@ -101,6 +101,16 @@ public abstract class AbstractPlayer implements IConsumerQueueHolder<Player> {
     private String displayName;
 
     /**
+     * 玩家当前的位置的缓存值，只在玩家退出游戏时更新。
+     * <p>
+     * The cached value of the player's current location,
+     * only updated when the player exits the game.
+     *
+     * @see #getLocation()
+     */
+    private Location location;
+
+    /**
      * 延迟执行队列，用于在玩家离线时缓存操作。
      * <p>
      * Delayed execution queue, used to cache operations when the player is offline.
@@ -192,6 +202,20 @@ public abstract class AbstractPlayer implements IConsumerQueueHolder<Player> {
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
         runWhenOnline(player -> player.setDisplayName(displayName));
+    }
+
+    /**
+     * 获取玩家当前的位置，当玩家不在线时，将返回玩家最后一次下线时所在的位置。
+     * <p>
+     * Get the current location of the player,
+     * when the player is offline, the location where the player last logged off will be returned.
+     *
+     * @return the current location of the player, or the location where the player last logged off.
+     */
+    @OfflineCached
+    public Location getLocation() {
+        if (isOnline()) return getRawPlayer().getLocation();
+        return location;
     }
 
     /**
@@ -289,10 +313,15 @@ public abstract class AbstractPlayer implements IConsumerQueueHolder<Player> {
      * This will get the latest information of the player from Bukkit and update it.
      * <br/>
      * This requires the player to be online.
+     *
+     * @throws IllegalStateException if the player is offline.
      */
     public void updateCache() {
         if (!isOnline()) throw new IllegalStateException("Cannot update cache when player offline");
+
         setDisplayName(getRawPlayer().getDisplayName());
+
+        location = getRawPlayer().getLocation();
     }
 
     @NotNull

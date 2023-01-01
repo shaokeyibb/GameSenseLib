@@ -61,6 +61,8 @@ public class BukkitEventMapperModule implements IModule, Listener {
         // Find the player in the game.
         val player = game.findPlayer(e.getPlayer());
         if (player == null) return;
+        // Update cache when player quit server
+        player.updateCache();
         // Call event
         game.postEvent(new PlayerPreQuitGameEvent(game, player));
     }
