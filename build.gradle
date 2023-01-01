@@ -1,4 +1,5 @@
 plugins {
+    id 'maven-publish'
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.7.20'
     id 'org.jetbrains.dokka' version '1.7.20'
@@ -28,7 +29,7 @@ dependencies {
 
     implementation 'org.jetbrains:annotations:16.0.2'
 
-    implementation 'org.greenrobot:eventbus-java:3.3.1'
+    api 'org.greenrobot:eventbus-java:3.3.1'
 
     implementation 'org.bstats:bstats-bukkit:3.0.0'
 
@@ -63,14 +64,23 @@ processResources {
     }
 }
 
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = this.group
+            artifactId = "GameSenseLib"
+            version = this.version
+
+            from components.java
+        }
+    }
+}
+
 artifacts {
     archives shadowJar
 }
 
 shadowJar {
-    dependencies {
-        exclude '*kotlin*'
-    }
     relocate('org.greenrobot.eventbus', 'io.hikarilan.gamesenselib.shade.org.greenrobot.eventbus')
     relocate('org.jetbrains.annotations', 'io.hikarilan.gamesenselib.shade.org.jetbrains.annotations')
     relocate('org.bstats', 'io.hikarilan.gamesenselib.shade.org.bstats')
