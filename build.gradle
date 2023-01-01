@@ -81,7 +81,9 @@ artifacts {
 }
 
 shadowJar {
-    relocate('org.greenrobot.eventbus', 'io.hikarilan.gamesenselib.shade.org.greenrobot.eventbus')
+    relocate('org.greenrobot.eventbus', 'io.hikarilan.gamesenselib.shade.org.greenrobot.eventbus') {
+        exclude "org.greenrobot.eventbus.Subscribe"
+    }
     relocate('org.jetbrains.annotations', 'io.hikarilan.gamesenselib.shade.org.jetbrains.annotations')
     relocate('org.bstats', 'io.hikarilan.gamesenselib.shade.org.bstats')
     minimize()
