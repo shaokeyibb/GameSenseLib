@@ -271,6 +271,8 @@ public class BossBarWaitingRoomModule extends AbstractListenerModule {
     public void onPlayerJoinGame(PlayerPreJoinGameEvent e) {
         e.getPlayer().runWhenOnline(player -> timerBossbar.addPlayer(player));
 
+        pastLocations.put(e.getPlayer(), e.getPlayer().getLocation());
+
         if (lobbyLocation != null) {
             e.getPlayer().teleport(lobbyLocation);
         }
