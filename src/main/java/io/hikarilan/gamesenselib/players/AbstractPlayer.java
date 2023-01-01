@@ -282,6 +282,19 @@ public abstract class AbstractPlayer implements IConsumerQueueHolder<Player> {
         getRawPlayer().sendTitle(title, subtitle, fadeIn, stay, fadeOut);
     }
 
+    /**
+     * 踢出玩家。
+     * <p>
+     * Kicks player with custom kick message.
+     *
+     * @param message kick message
+     * @see Player#kickPlayer(String)
+     */
+    @OfflineQueued
+    public void kickPlayer(String message) {
+        runWhenOnline(player -> player.kickPlayer(message));
+    }
+
 
     /**
      * 销毁此玩家实例

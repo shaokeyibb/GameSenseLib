@@ -1,6 +1,5 @@
 package io.hikarilan.gamesenselib.modules.extra;
 
-import com.google.common.collect.Maps;
 import io.hikarilan.gamesenselib.events.game.*;
 import io.hikarilan.gamesenselib.games.AbstractGame;
 import io.hikarilan.gamesenselib.modules.AbstractListenerModule;
@@ -17,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.util.Map;
 
 /**
  * 带有 BossBar 显示的等待大厅模块
@@ -139,13 +137,6 @@ public class BossBarWaitingRoomModule extends AbstractListenerModule {
     private BossBar timerBossbar;
 
     /**
-     * 玩家加入大厅前所在的位置
-     * <p>
-     * The location where the player was before joining the lobby
-     */
-    private final Map<AbstractPlayer, Location> pastLocations = Maps.newHashMap();
-
-    /**
      * 创建一个等待大厅模块。
      * <p>
      * Create a waiting room module.
@@ -250,7 +241,6 @@ public class BossBarWaitingRoomModule extends AbstractListenerModule {
         status = Status.INITIALING;
         timer = Durations.toTick(countdown);
         timerBossbar = Bukkit.createBossBar(null, BarColor.WHITE, BarStyle.SOLID);
-        pastLocations.clear();
     }
 
     @Override
@@ -271,8 +261,6 @@ public class BossBarWaitingRoomModule extends AbstractListenerModule {
     public void onPlayerJoinGame(PlayerPreJoinGameEvent e) {
         e.getPlayer().runWhenOnline(player -> timerBossbar.addPlayer(player));
 
-        pastLocations.put(e.getPlayer(), e.getPlayer().getLocation());
-
         if (lobbyLocation != null) {
             e.getPlayer().teleport(lobbyLocation);
         }
@@ -285,10 +273,6 @@ public class BossBarWaitingRoomModule extends AbstractListenerModule {
     @Subscribe
     public void onPlayerQuitGame(PlayerPreQuitGameEvent e) {
         e.getPlayer().runWhenOnline(player -> timerBossbar.removePlayer(player));
-
-        if (pastLocations.containsKey(e.getPlayer())) {
-            e.getPlayer().teleport(pastLocations.get(e.getPlayer()));
-        }
 
         getGame().removePlayer(e.getPlayer());
 

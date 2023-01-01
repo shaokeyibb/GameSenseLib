@@ -51,6 +51,11 @@ public class GameTemplate {
     private boolean allowRejoinPlayer = false;
 
     /**
+     * @see #setTeleportPlayerOnQuit(boolean)
+     */
+    private boolean teleportPlayerOnQuit = true;
+
+    /**
      * 为指定优先级的游戏流程添加游戏阶段，优先级应大于等于 0。
      * <br/>
      * 指定的优先级将会 +10，以便于 {@link GameTemplate} 注入游戏流程。
@@ -174,6 +179,25 @@ public class GameTemplate {
     }
 
     /**
+     * 将退出游戏的玩家踢出服务器或传送到其加入游戏前的位置（默认启用）
+     * <br/>
+     * 如果该游戏是一个 world 或 shared 实例，则玩家会被传送至其加入游戏前所在的位置；
+     * 如果该游戏是一个 independent 实例，则玩家会被踢出服务器。
+     * <p>
+     * Kick out the player who quit the game from the server
+     * or teleport to the position before joining the game (enabled by default)
+     * <br/>
+     * If the game is a world or shared instance,
+     * the player will be teleported to the position where he was before joining the game;
+     * If the game is an independent instance,
+     * the player will be kicked out of the server.
+     */
+    public GameTemplate setTeleportPlayerOnQuit(boolean teleportPlayerOnQuit) {
+        this.teleportPlayerOnQuit = teleportPlayerOnQuit;
+        return this;
+    }
+
+    /**
      * 创建一个共享游戏实例
      * <br/>
      * 一个共享游戏实例可在单个服务端实例中存在多个，
@@ -187,7 +211,7 @@ public class GameTemplate {
      * @return shared game template
      */
     public SharedGameTemplate shared() {
-        applySettings();
+        applySettings(0);
         return new SharedGameTemplate(this);
     }
 
@@ -205,7 +229,7 @@ public class GameTemplate {
      * @return independent game template
      */
     public WorldGameTemplate world(World world) {
-        applySettings();
+        applySettings(1);
         return new WorldGameTemplate(this, world);
     }
 
@@ -223,17 +247,25 @@ public class GameTemplate {
      * @return independent game template
      */
     public IndependentGameTemplate independent() {
-        applySettings();
+        applySettings(2);
         return new IndependentGameTemplate(this);
     }
 
-    private void applySettings() {
+    private void applySettings(int instanceType /* 0 for shared, 1 for world, 2 for independent */) {
         if (removePlayerOnQuit) {
-            flowManagerBuilder.addPhase(1, () -> Phase.builder().onStart(it -> it.installModule(new IngamePlayerImmediatelyQuitGameModule(it, !allowRejoinPlayer))).build());
+            // make sure the module is added after the game starts
+            addPhase(0, () -> Phase.builder().onStart(it -> it.installModule(new IngamePlayerImmediatelyQuitGameModule(it, !allowRejoinPlayer))).build());
         }
         if (allowRejoinPlayer) {
             // make sure the module is added after the game starts
-            flowManagerBuilder.addPhase(1, () -> Phase.builder().onStart(it -> it.installModule(new IngamePlayerRejoinGameModule(it))).build());
+            addPhase(0, () -> Phase.builder().onStart(it -> it.installModule(new IngamePlayerRejoinGameModule(it))).build());
+        }
+        if (teleportPlayerOnQuit) {
+            if (instanceType == 0 || instanceType == 1) {
+                gameConfigurators.add(new PlayerQuitGameTeleportingConfigurator(false));
+            } else if (instanceType == 2) {
+                gameConfigurators.add(new PlayerQuitGameTeleportingConfigurator(true));
+            }
         }
     }
 
@@ -303,6 +335,17 @@ public class GameTemplate {
         @Override
         public void configure(Plugin plugin, AbstractGame game) {
             game.installModule(new PlayerJoinAndQuitGameBroadcastModule(game, joinMessage, quitMessage));
+        }
+    }
+
+    @RequiredArgsConstructor
+    public static class PlayerQuitGameTeleportingConfigurator implements GameConfigurator {
+
+        private final boolean kickPlayer;
+
+        @Override
+        public void configure(Plugin plugin, AbstractGame game) {
+            game.installModule(new PlayerQuitGameTeleportingModule(game, kickPlayer));
         }
     }
 
