@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -64,12 +65,56 @@ public abstract class AbstractGame implements IReusable, IModuleHolder, IGameEve
     @Getter
     private final Map<Class<? extends IModule>, IModule> installedModules = Maps.newHashMap();
 
-    public AbstractGame(Plugin plugin, FlowManager.FlowManagerBuilder flowManagerBuilder) {
+    /**
+     * 生成一个游戏实例，并使用 {@link #generateFlowManager()} 方法的返回值生成流程管理器。
+     * <br/>
+     * 此构造器对于生成更加复杂的流程管理器时非常有用。
+     * 使用时，需要覆盖 {@link #generateFlowManager()} 方法。
+     * <p>
+     * Generate a game instance and use the return value of the {@link #generateFlowManager()} method to generate the flow manager.
+     * <br/>
+     * This constructor is very useful for generating more complex flow managers.
+     * When used, you need to override the {@link #generateFlowManager()} method.
+     */
+    protected AbstractGame(@NotNull Plugin plugin) {
+        this.plugin = plugin;
+        this.flowManager = Objects.requireNonNull(generateFlowManager()).$game(this).build();
+
+        init();
+    }
+
+    /**
+     * 生成一个游戏实例，并使用给定的 {@link FlowManager.FlowManagerBuilder} 生成流程管理器。
+     * <br/>
+     * 这是最简单的生成游戏实例的方法，
+     * 可以使用 {@link io.hikarilan.gamesenselib.games.extra.DefaultGame} 作为默认实现。
+     * <p>
+     * Generate a game instance and use the given {@link FlowManager.FlowManagerBuilder} to generate the flow manager.
+     * <br/>
+     * This is the simplest way to generate a game instance,
+     * you may use {@link io.hikarilan.gamesenselib.games.extra.DefaultGame} as the default implementation.
+     */
+    public AbstractGame(@NotNull Plugin plugin, @NotNull FlowManager.FlowManagerBuilder flowManagerBuilder) {
         this.plugin = plugin;
         this.flowManager = flowManagerBuilder.$game(this).build();
 
         init();
     }
+
+    /**
+     * 生成一个流程管理器。
+     * <br/>
+     * 当使用 {@link #AbstractGame(Plugin)} 构造器时，此方法返回值不应为 {@code null}。
+     * <p>
+     * Generate a flow manager.
+     * <br/>
+     * When using the {@link #AbstractGame(Plugin)} constructor,
+     * the return value of this method should not be {@code null}.
+     *
+     * @return the flow manager builder generated.
+     */
+    @Nullable
+    protected abstract FlowManager.FlowManagerBuilder generateFlowManager();
 
     /**
      * 获取该实例内的所有玩家实例的副本。
