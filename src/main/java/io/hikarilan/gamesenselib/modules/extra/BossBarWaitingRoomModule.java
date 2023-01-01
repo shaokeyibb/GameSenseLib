@@ -254,6 +254,7 @@ public class BossBarWaitingRoomModule extends AbstractListenerModule {
     public void onAttemptToJoin(PlayerAttemptToJoinGameEvent e) {
         val playerCount = getGame().getPlayers(true, ingamePlayerClass).size();
         if (playerCount >= maxPlayerCount) return;
+        if (getGame().findPlayer(e.getPlayer()) != null) return;
         e.setCancelled(false);
     }
 
