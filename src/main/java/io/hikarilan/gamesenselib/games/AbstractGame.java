@@ -2,7 +2,6 @@ package io.hikarilan.gamesenselib.games;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import io.hikarilan.gamesenselib.annotations.Internal;
 import io.hikarilan.gamesenselib.artifacts.IReusable;
 import io.hikarilan.gamesenselib.events.IGameEventBus;
 import io.hikarilan.gamesenselib.events.IGameListener;
@@ -17,6 +16,7 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.greenrobot.eventbus.EventBus;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,7 +43,7 @@ public abstract class AbstractGame implements IReusable, IModuleHolder, IGameEve
      * The flow manager of this game instance.
      */
     @Getter
-    @Internal
+    @ApiStatus.Internal
     private final FlowManager flowManager;
 
     /**

@@ -1,7 +1,6 @@
 package io.hikarilan.gamesenselib.players;
 
 import com.google.common.collect.Queues;
-import io.hikarilan.gamesenselib.annotations.Internal;
 import io.hikarilan.gamesenselib.annotations.OfflineCached;
 import io.hikarilan.gamesenselib.annotations.OfflineQueued;
 import io.hikarilan.gamesenselib.artifacts.IConsumerQueueHolder;
@@ -14,6 +13,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Queue;
@@ -133,7 +133,7 @@ public abstract class AbstractPlayer implements IConsumerQueueHolder<Player> {
      *
      * @return the bukkit player instance, or {@code null} when the player is offline.
      */
-    @Internal
+    @ApiStatus.Internal
     protected Player getRawPlayer() {
         return Bukkit.getPlayer(uniqueId);
     }
@@ -146,7 +146,7 @@ public abstract class AbstractPlayer implements IConsumerQueueHolder<Player> {
      * @param other the other player
      * @return {@code true} if this {@link AbstractPlayer} object wraps the specified {@link Player} object
      */
-    @Internal
+    @ApiStatus.Internal
     public boolean isWrapper(Player other) {
         return uniqueId.equals(other.getUniqueId());
     }
@@ -159,7 +159,7 @@ public abstract class AbstractPlayer implements IConsumerQueueHolder<Player> {
      * @param game the game
      * @return {@code true} if this {@link AbstractPlayer} object belongs to the specified {@link AbstractGame} object
      */
-    @Internal
+    @ApiStatus.Internal
     public boolean isWrapper(AbstractGame game) {
         return this.game == game;
     }
