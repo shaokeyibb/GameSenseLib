@@ -76,7 +76,7 @@ public class FlowManager implements IReusable {
      */
     private boolean next() {
         val nextPointer = game.postEvent(new FlowPointerTransferEvent(game)).getPointer();
-        if (nextPointer >= 0) pointer = nextPointer;
+        if (nextPointer >= 0) pointer = nextPointer - 1;
 
         // If the maximum number of phases is reached, stop going to the next flow.
         if (pointer + 1 > flows.keySet().stream().max(Comparator.comparingInt(Integer::intValue)).orElse(0))
