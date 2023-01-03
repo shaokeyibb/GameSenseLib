@@ -3,9 +3,11 @@ package io.hikarilan.gamesenselib.flows;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.hikarilan.gamesenselib.artifacts.IReusable;
+import io.hikarilan.gamesenselib.events.flow.FlowPointerTransferEvent;
 import io.hikarilan.gamesenselib.games.AbstractGame;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.val;
 import lombok.var;
 import org.jetbrains.annotations.NotNull;
 
@@ -53,6 +55,10 @@ public class FlowManager implements IReusable {
     /**
      * 尝试进入下一个流程。
      * <br/>
+     * 在尝试进入下一个流程前，将会触发 {@link FlowPointerTransferEvent} 事件。
+     * 如果此事件的 {@link FlowPointerTransferEvent#setPointer(int)} 被设置为一个有效值，则将会跳转到该值所指向的流程（如果存在）。
+     * 否则，将会继续尝试进入下一个流程
+     * <br/>
      * 如果已达到最高优先级，则不会进入下一个流程；
      * 如果下一个优先级不存在，则会直接跳过并继续尝试进入下一个流程。
      * <p>
@@ -60,10 +66,18 @@ public class FlowManager implements IReusable {
      * <br/>
      * If the maximum number of phases is reached, will not enter the next flow;
      * If next priority is not exist, the priority will be skipped and continue to attempt to enter.
+     * <br/>
+     * Before attempting to enter the next flow, the {@link FlowPointerTransferEvent} event will be triggered.
+     * If the {@link FlowPointerTransferEvent#setPointer(int)} of this event is set to a valid value,
+     * it will jump to the flow pointed to by that value (if it exists).
+     * Otherwise, it will continue to attempt to enter the next flow.
      *
      * @return Should enter next flow.
      */
     private boolean next() {
+        val nextPointer = game.postEvent(new FlowPointerTransferEvent(game)).getPointer();
+        if (nextPointer >= 0) pointer = nextPointer;
+
         // If the maximum number of phases is reached, stop going to the next flow.
         if (pointer + 1 > flows.keySet().stream().max(Comparator.comparingInt(Integer::intValue)).orElse(0))
             return false;
