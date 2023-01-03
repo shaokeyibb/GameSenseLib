@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static io.hikarilan.gamesenselib.utils.Durations.isZeroOrNegative;
@@ -61,7 +61,7 @@ public class Phase implements IReusable {
      * <p>
      * Invoke when phase running, until all phases in the same time need be ended the runs.
      */
-    Function<AbstractGame, Boolean> onTick;
+    Predicate<AbstractGame> onTick;
     /**
      * 当阶段结束时被调用。
      * <p>
@@ -70,7 +70,7 @@ public class Phase implements IReusable {
     Consumer<AbstractGame> onEnd;
 
     @Builder
-    public Phase(@Nullable Consumer<AbstractGame> onStart, @Nullable Function<AbstractGame, Boolean> onTick, @Nullable Consumer<AbstractGame> onEnd) {
+    public Phase(@Nullable Consumer<AbstractGame> onStart, @Nullable Predicate<AbstractGame> onTick, @Nullable Consumer<AbstractGame> onEnd) {
         this.onStart = onStart;
         this.onTick = onTick;
         this.onEnd = onEnd;
@@ -144,7 +144,7 @@ public class Phase implements IReusable {
         }
 
         if (!isTickFinish) {
-            isTickFinish = onTick.apply(game);
+            isTickFinish = onTick.test(game);
             return false;
         }
 
