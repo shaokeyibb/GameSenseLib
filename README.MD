@@ -7,7 +7,7 @@ Build your game with a simple style API with some built-in modules:
 ```java
 public class ExampleGame {
     public static AbstractGame simpleGame() {
-        GameTemplate.of(this)
+        GameTemplate.of(plugin)
                 .withWaitingRoom(
                         1, // min player
                         2, // max player
