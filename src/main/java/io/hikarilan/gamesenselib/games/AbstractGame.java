@@ -59,6 +59,7 @@ public abstract class AbstractGame implements IReusable, IModuleHolder, IGameEve
     @Getter
     private final EventBus eventBus = EventBus.builder()
             .eventInheritance(false)
+            .logNoSubscriberMessages(false)
             .sendNoSubscriberEvent(false)
             .build();
 
